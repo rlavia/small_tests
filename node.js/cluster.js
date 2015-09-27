@@ -13,7 +13,7 @@ if (cluster.isMaster) {
 } else {
  http.createServer(function(req, res) {
   res.writeHead(200);
-  res.end(&amp;amp;quot;hello worldn&amp;amp;quot;);
+  res.end("hello world");
  }).listen(8000);
 }
 
