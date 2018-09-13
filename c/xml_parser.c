@@ -1,11 +1,13 @@
 
+
+
 /**************************************************************************************
 Parser
 **************************************************************************************/
 int parse(char* xml,void (*eventHandler)(char*, char*))
 {
   customEventHandler = eventHandler;
-  if(parse_document(&amp;amp;amp;amp;xml))
+  if(parse_document(&xml))
   {
     return 1;
   }
@@ -16,11 +18,11 @@ document           ::=           prolog  element  Misc*
 **************************************************************************************/
 int parse_document(char** xml)
 {
-  raiseEvent(&amp;amp;amp;quot;startDocument&amp;amp;amp;quot;,&amp;amp;amp;quot;&amp;amp;amp;quot;);
+  raiseEvent("startDocument","");
   if(parse_prolog(xml))    return 1;
   if(parse_element(xml))   return 1;
   parse_misc(xml);
-  raiseEvent(&amp;amp;amp;quot;endDocument&amp;amp;amp;quot;,&amp;amp;amp;quot;&amp;amp;amp;quot;);
+  raiseEvent("endDocument","");
   return 0;
 }
 
@@ -36,27 +38,27 @@ int parse_prolog(char** xml)
   return 0;
 }
 /**************************************************************************************
-        XMLDecl    ::=          '&amp;amp;amp;lt;?xml' VersionInfo  EncodingDecl? SDDecl? S? '?&amp;amp;amp;gt;'
+        XMLDecl    ::=          '&lt;?xml' VersionInfo  EncodingDecl? SDDecl? S? '?&gt;'
 **************************************************************************************/
 int parse_XMLDecl(char** xml)
 {
-  if(parse_literal(xml,'&amp;amp;amp;lt;')!=0)    return 1;
+  if(parse_literal(xml,'&lt;')!=0)    return 1;
   if(parse_literal(xml,'?')!=0)    return 1;
   if(parse_literal(xml,'x')!=0)    return 1;
   if(parse_literal(xml,'m')!=0)    return 1;
   if(parse_literal(xml,'l')!=0)    return 1;
   if(parse_S(xml))         return 1;
   while (getCharacter(xml)!='?') {};
-  if(parse_literal(xml,'&amp;amp;amp;gt;')==1)       return 1;
+  if(parse_literal(xml,'&gt;')==1)       return 1;
   return 0;
 }
 /**************************************************************************************
-doctypedecl        ::=          '&amp;amp;amp;lt;!DOCTYPE' S  Name (S  ExternalID)? S? ('[' intSubset ']' S?)? '&amp;amp;amp;gt;'
+doctypedecl        ::=          '&lt;!DOCTYPE' S  Name (S  ExternalID)? S? ('[' intSubset ']' S?)? '&gt;'
 **************************************************************************************/
 int parse_doctypedecl(char** xml)
 {
   char szName[ELEMENT_NAME_MAX_SIZE];
-  if(parse_literal(xml,'&amp;amp;amp;lt;')==1) return 1;
+  if(parse_literal(xml,'&lt;')==1) return 1;
   if(parse_literal(xml,'!')==1) return 1;
   if(parse_literal(xml,'D')==1) return 1;
   if(parse_literal(xml,'O')==1) return 1;
@@ -68,8 +70,8 @@ int parse_doctypedecl(char** xml)
   if(parse_S(xml))         return 1;
   if(parse_Name(xml,szName)) return 1;
   parse_S(xml);
-  while (getCharacter(xml)!='&amp;amp;amp;gt;')  {};
-  raiseEvent(&amp;amp;amp;quot;doctypedecl&amp;amp;amp;quot;,szName);
+  while (getCharacter(xml)!='&gt;')  {};
+  raiseEvent("doctypedecl",szName);
   return 0;
 }
 /**************************************************************************************
@@ -115,17 +117,17 @@ int parse_element(char** xml)
   }
 }
 /**************************************************************************************
-STag       ::=          '&amp;amp;amp;lt;' Name (S  Attribute)* S? '&amp;amp;amp;gt;'
+STag       ::=          '&lt;' Name (S  Attribute)* S? '&gt;'
 **************************************************************************************/
 int parse_STag(char** xml,char *szSTagName)
 {
   char c;
-  char szName[ELEMENT_NAME_MAX_SIZE]=&amp;amp;amp;quot;&amp;amp;amp;quot;;
+  char szName[ELEMENT_NAME_MAX_SIZE]="";
   char* pos1;
   /*strini(szName,ELEMENT_NAME_MAX_SIZE);*/
   pos1=*xml;
   c = getCharacter(xml);
-  if(c!='&amp;amp;amp;lt;')
+  if(c!='&lt;')
   {
     *xml=pos1;
     return 1;
@@ -136,26 +138,26 @@ int parse_STag(char** xml,char *szSTagName)
     return 1;
   }
   c = getCharacter(xml);
-  if(c!='&amp;amp;amp;gt;') {
+  if(c!='&gt;') {
     return 1;
   }
   strcpy(szSTagName,szName);
-  raiseEvent(&amp;amp;amp;quot;startElement&amp;amp;amp;quot;,szName);
+  raiseEvent("startElement",szName);
   return 0;
 }
 /**************************************************************************************
-ETag       ::=          '&amp;amp;amp;lt;/' Name  S? '&amp;amp;amp;gt;'
+ETag       ::=          '&lt;/' Name  S? '&gt;'
 **************************************************************************************/
 int parse_ETag(char** xml,char *szETagName)
 {
     char c;
-    char szName[ELEMENT_NAME_MAX_SIZE]=&amp;amp;amp;quot;&amp;amp;amp;quot;;
+    char szName[ELEMENT_NAME_MAX_SIZE]="";
     char szNameTemp[ELEMENT_NAME_MAX_SIZE];
     char* pos1;
     pos1=*xml;
     /*strini(szName,ELEMENT_NAME_MAX_SIZE);*/
     c = getCharacter(xml);
-    if(c!='&amp;amp;amp;lt;')
+    if(c!='&lt;')
     {
       *xml=pos1;
       return 1;
@@ -172,26 +174,26 @@ int parse_ETag(char** xml,char *szETagName)
       return 1;
     }
     c = getCharacter(xml);
-    if(c!='&amp;amp;amp;gt;')
+    if(c!='&gt;')
     {
       *xml=pos1;
       return 1;
     }
     strcpy(szETagName,szName);
-    raiseEvent(&amp;amp;amp;quot;endElement&amp;amp;amp;quot;,szName);    
+    raiseEvent("endElement",szName);    
     return 0;
 }
 /**************************************************************************************
-        EmptyElemTag       ::=          '&amp;amp;amp;lt;' Name (S  Attribute)* S? '/&amp;amp;amp;gt;'
+        EmptyElemTag       ::=          '&lt;' Name (S  Attribute)* S? '/&gt;'
 **************************************************************************************/
 int parse_EmptyElemTag(char** xml)
 {
     char c;
-    char szName[ELEMENT_NAME_MAX_SIZE]=&amp;amp;amp;quot;&amp;amp;amp;quot;;
+    char szName[ELEMENT_NAME_MAX_SIZE]="";
     char* pos1;
     pos1 = *xml;
     /*strini(szName,ELEMENT_NAME_MAX_SIZE);*/
-    if(parse_literal(xml,'&amp;amp;amp;lt;')==1)
+    if(parse_literal(xml,'&lt;')==1)
     {
       *xml=pos1;
       return 1;
@@ -207,7 +209,7 @@ int parse_EmptyElemTag(char** xml)
       return 1;
     }
     if(parse_literal(xml,'/')==1) return 1;
-    raiseEvent(&amp;amp;amp;quot;EmptyElemTag&amp;amp;amp;quot;,szName);
+    raiseEvent("EmptyElemTag",szName);
     return 0;
 }
 /**************************************************************************************
@@ -217,7 +219,7 @@ int parse_Content(char** xml)
 {
   char c;
   char* pos1;
-  char szText[CONTENT_TEXT_MAX_SIZE]=&amp;amp;amp;quot;&amp;amp;amp;quot;;
+  char szText[CONTENT_TEXT_MAX_SIZE]="";
   int i;
 
   /*strini(szText,CONTENT_TEXT_MAX_SIZE);*/
@@ -226,7 +228,7 @@ int parse_Content(char** xml)
   pos1 = *xml;
   parse_S(xml);
   c = getCharacter(xml);
-  if(c=='&amp;amp;amp;lt;')
+  if(c=='&lt;')
   {
     (*xml)--;
     while(!parse_element(xml))
@@ -241,7 +243,7 @@ int parse_Content(char** xml)
     c=getCharacter(xml);
     szText[i] = c;
     i++;
-    while(c!='&amp;amp;amp;lt;' &amp;amp;amp;amp;&amp;amp;amp;amp; c!='&amp;amp;amp;gt;')
+    while(c!='&lt;' && c!='&gt;')
     {
       c = getCharacter(xml);
       szText[i] = c;
@@ -254,7 +256,7 @@ int parse_Content(char** xml)
     {
       return 1;
     }
-    raiseEvent(&amp;amp;amp;quot;characters&amp;amp;amp;quot;, szText);
+    raiseEvent("characters", szText);
     return 0;
   }
 }
@@ -268,10 +270,10 @@ int parse_Name(char** xml,char* szName)
   char szTemp[ELEMENT_NAME_MAX_SIZE];
   strini(szTemp,ELEMENT_NAME_MAX_SIZE);
   pos1 = *xml;
-  if (parse_Letter(xml,&amp;amp;amp;amp;c))
+  if (parse_Letter(xml,&c))
   {
     c=getCharacter(xml);
-    if( (c!='_') &amp;amp;amp;amp;&amp;amp;amp;amp; (c!=':') )
+    if( (c!='_') && (c!=':') )
     {
       *xml = pos1;
       return 1;
@@ -297,7 +299,7 @@ int parse_Letter(char** xml,char* letter)
   pos1 = *xml;
   c = getCharacter(xml);
   *letter=c;
-  if ( !( (c&amp;amp;amp;gt;='A' &amp;amp;amp;amp;&amp;amp;amp;amp; c&amp;amp;amp;lt;='Z') || (c&amp;amp;amp;gt;='a' &amp;amp;amp;amp;&amp;amp;amp;amp; c&amp;amp;amp;lt;='z') ) )
+  if ( !( (c&gt;='A' && c&lt;='Z') || (c&gt;='a' && c&lt;='z') ) )
   {
     *xml = pos1;
     return 1;
@@ -315,7 +317,7 @@ int parse_NameChar(char** xml,char* szName)
   szName[0]=c;
   i++;
   while(
-          (c&amp;amp;amp;gt;='1' &amp;amp;amp;amp;&amp;amp;amp;amp; c&amp;amp;amp;lt;='0') || (c&amp;amp;amp;gt;='A' &amp;amp;amp;amp;&amp;amp;amp;amp; c&amp;amp;amp;lt;='Z') || (c&amp;amp;amp;gt;='a' &amp;amp;amp;amp;&amp;amp;amp;amp; c&amp;amp;amp;lt;='z') ||
+          (c&gt;='1' && c&lt;='0') || (c&gt;='A' && c&lt;='Z') || (c&gt;='a' && c&lt;='z') ||
           (c=='.') || (c=='_') || (c==':') || (c=='-')
        )
   {
@@ -334,7 +336,7 @@ Misc       ::=           Comment | PI | S
 int parse_misc(char** xml)
 {
   if(parse_S(xml)) return 1;
-  /*raiseEvent(&amp;amp;amp;quot;Misc&amp;amp;amp;quot;,&amp;amp;amp;quot;&amp;amp;amp;quot;);*/
+  /*raiseEvent("Misc","");*/
   return 0;
 }
 /**************************************************************************************
@@ -395,8 +397,13 @@ void raiseEvent(char* szEventName, char* szText)
 void strini(char* s,long l)
 {
   long i=0;
-  for(i=0;i&amp;amp;amp;lt;l;i++) s[i] = '&#092;&#048;';
+  for(i=0;i&lt;l;i++) s[i] = '&#092;&#048;';
 }
+
+
+
+
+
 
 
 
