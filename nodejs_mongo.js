@@ -20,7 +20,7 @@ module.exports.DataAccessLayer = function () {
     that.insert = function(collectionName, obj) {
         console.log( DataAccessLayer.insert() );
         var collection;
-        :that.mongoClient.connect(that.connectionURL, function(err, db) {
+        that.mongoClient.connect(that.connectionURL, function(err, db) {
             collection = db.collection(collectionName);
             collection.insert(obj, { w: 0 });
         });
