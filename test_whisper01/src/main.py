@@ -4,6 +4,7 @@ model = whisper.load_model("base")
 #model = whisper.load_model("small")
 #model = whisper.load_model("medium")
 
+
 print("\n\n")
 
 result = model.transcribe("./assets/ya_lo_vas_a_entender.wav")
